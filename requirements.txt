@@ -1,5 +1,4 @@
-Flask
-whisper
-torch
+streamlit
+openai-whisper
 pydub
 ffmpeg-python

@@ -1,4 +1,5 @@
 flask
 openai-whisper
+pydub
 scipy
 torch

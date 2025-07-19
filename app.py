@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import whisper
-from pydub import AudioSegment
 import tempfile
 import os
 import pyaudioop as audioop

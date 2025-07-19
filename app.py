@@ -5,7 +5,7 @@ import tempfile
 import os
 
 app = Flask(__name__)
-model = whisper.load_model("base")  # You can change to "tiny" if needed
+model = whisper.load_model("tiny")  # You can change to "tiny" if needed
 
 @app.route('/')
 def home():

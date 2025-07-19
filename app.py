@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 import whisper
 import tempfile
 import os
-import pyaudioop as audioop
 app = Flask(__name__)
 model = whisper.load_model("tiny")  # You can change to "tiny" if needed
 

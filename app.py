@@ -1,33 +1,26 @@
-import streamlit as st
+from flask import Flask, request, jsonify
 import whisper
 from pydub import AudioSegment
 import tempfile
 import os
 
-st.set_page_config(page_title="Whisper Transcriber", layout="centered")
+app = Flask(__name__)
+model = whisper.load_model("base")  # You can change to "tiny" if needed
 
-st.title("🎧 Audio Transcriber")
-st.write("Upload an audio file (MP3, WAV, M4A) to get a transcription using OpenAI's Whisper model.")
+@app.route('/')
+def home():
+    return "Whisper Audio Transcriber API is Running!"
 
-uploaded_file = st.file_uploader("Upload Audio File", type=["mp3", "wav", "m4a"])
+@app.route('/transcribe', methods=['POST'])
+def transcribe():
+    if 'file' not in request.files:
+        return jsonify({"error": "No audio file uploaded"}), 400
 
-if uploaded_file is not None:
-    st.audio(uploaded_file)
-
+    audio_file = request.files['file']
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-        audio = AudioSegment.from_file(uploaded_file)
+        audio = AudioSegment.from_file(audio_file)
         audio.export(tmp.name, format="wav")
-        wav_file = tmp.name
+        result = model.transcribe(tmp.name)
+        os.remove(tmp.name)
 
-    st.info("Transcribing... please wait ⏳")
-
-    model = whisper.load_model("base")  # Change to "tiny" if needed
-    result = model.transcribe(wav_file)
-    transcription = result["text"]
-
-    st.subheader("📝 Transcription:")
-    st.write(transcription)
-
-    st.download_button("📥 Download as .txt", transcription, file_name="transcription.txt")
-
-    os.remove(wav_file)
+    return jsonify({"transcription": result["text"]})

@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+os.environ["PATH"] += os.pathsep + r"C:\Users\YourName\Downloads\ffmpeg-6.0-full_build\bin"
 import whisper
 import tempfile
 import os

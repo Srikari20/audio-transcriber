@@ -1,24 +1,31 @@
-from flask import Flask, request, jsonify
+import streamlit as st
 import whisper
 import tempfile
 import os
-app = Flask(__name__)
-model = whisper.load_model("tiny")  # You can change to "tiny" if needed
 
-@app.route('/')
-def home():
-    return "Whisper Audio Transcriber API is Running!"
+# Page setup
+st.set_page_config(page_title="Whisper Transcriber", layout="centered")
+st.title("🎤 Whisper Audio Transcriber")
 
-@app.route('/transcribe', methods=['POST'])
-def transcribe():
-    if 'file' not in request.files:
-        return jsonify({"error": "No audio file uploaded"}), 400
+# Upload audio file
+uploaded_file = st.file_uploader("Upload your audio file", type=["mp3", "wav", "m4a"])
 
-    audio_file = request.files['file']
+if uploaded_file is not None:
+    # Save uploaded file to temp location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-        audio = AudioSegment.from_file(audio_file)
-        audio.export(tmp.name, format="wav")
-        result = model.transcribe(tmp.name)
-        os.remove(tmp.name)
+        tmp.write(uploaded_file.read())
+        tmp_path = tmp.name
 
-    return jsonify({"transcription": result["text"]})
+    # Load Whisper model
+    model = whisper.load_model("base")  # use "tiny" for faster response
+
+    # Transcribe audio
+    st.info("Transcribing...")
+    result = model.transcribe(tmp_path)
+
+    # Display result
+    st.subheader("Transcription:")
+    st.write(result["text"])
+
+    # Remove temp file
+    os.remove(tmp_path)

@@ -1,33 +1,32 @@
-import streamlit as st
 import os
-os.environ["PATH"] += os.pathsep + '/usr/bin'
+from pydub.utils import which
+
+os.environ["PATH"] += os.pathsep + "/usr/bin"
+AudioSegment.converter = which("ffmpeg")
+
+import os
+from pydub import AudioSegment
+from pydub.utils import which
 import whisper
-import tempfile
-import os
+import streamlit as st
 
-# Page setup
-st.set_page_config(page_title="Whisper Transcriber", layout="centered")
-st.title("🎤 Whisper Audio Transcriber")
+# Fix ffmpeg path for Streamlit Cloud
+os.environ["PATH"] += os.pathsep + "/usr/bin"
+AudioSegment.converter = which("ffmpeg")
 
-# Upload audio file
-uploaded_file = st.file_uploader("Upload your audio file", type=["mp3", "wav", "m4a"])
+# Load model
+model = whisper.load_model("base")
+
+st.title("🎤 Audio Transcriber")
+
+uploaded_file = st.file_uploader("Upload an audio file", type=["wav", "mp3", "m4a", "ogg"])
 
 if uploaded_file is not None:
-    # Save uploaded file to temp location
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-        tmp.write(uploaded_file.read())
-        tmp_path = tmp.name
+    with open("temp_audio.wav", "wb") as f:
+        audio = AudioSegment.from_file(uploaded_file)
+        audio.export(f, format="wav")
+        f.flush()
 
-    # Load Whisper model
-    model = whisper.load_model("base")  # use "tiny" for faster response
-
-    # Transcribe audio
-    st.info("Transcribing...")
-    result = model.transcribe(tmp_path)
-
-    # Display result
-    st.subheader("Transcription:")
+    result = model.transcribe("temp_audio.wav")
+    st.markdown("### Transcription:")
     st.write(result["text"])
-
-    # Remove temp file
-    os.remove(tmp_path)

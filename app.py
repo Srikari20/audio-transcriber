@@ -3,7 +3,7 @@ from pydub import AudioSegment
 from pydub.utils import which
 import whisper
 import streamlit as st
-
+import audioop 
 # Fix ffmpeg path for Streamlit Cloud
 os.environ["PATH"] += os.pathsep + "/usr/bin"
 AudioSegment.converter = which("ffmpeg")

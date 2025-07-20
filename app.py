@@ -4,7 +4,7 @@ import tempfile
 
 st.title("🎤 Audio Transcriber (Whisper Only)")
 
-model = whisper.load_model("base")
+model = whisper.load_model("tiny")
 
 uploaded_file = st.file_uploader("Upload an audio file", type=["wav", "mp3", "m4a", "ogg"])
 

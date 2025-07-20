@@ -1,2 +1,4 @@
-openai-whisper
 streamlit
+pydub
+openai-whisper
+torch
